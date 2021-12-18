@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/linesFragment"
+        android:title="Linee"
+        android:icon="@drawable/ic_lines"/>
+
+    <item
+        android:id="@+id/profileFragment"
+        android:title="Profilo"
+        android:icon="@drawable/ic_profile" />
+</menu>
