@@ -165,14 +165,8 @@ public class PostFragmentViewModel extends AndroidViewModel {
                                     new UpdateUserImageAsync(application, usersImage, new AsyncTaskCallback<UsersImage>() {
                                         @Override
                                         public void handleResponse(UsersImage response) {
-                                            Log.d(TAG, "User updated");
-                                            byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
-                                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                            //Quanto scritto male, mi fanno male gli occhi. Prendo il post, lo aggiorno e lo aggiungo. Rimetto nel array di mutableLiveData per essere aggiornato anhce nel adapter
-                                            Post post = allPosts.getValue().get(finalI);
-                                            post.setAuthorImage(decodedByte);
-                                            allPosts.getValue().set(finalI, post);
-                                            allPosts.setValue(allPosts.getValue());
+                                            Log.d(TAG, "User updated, image updated");
+                                            setUserPicture(base64Image, finalI, posts);
                                         }
 
                                         @Override
@@ -191,6 +185,8 @@ public class PostFragmentViewModel extends AndroidViewModel {
                                 new InsertUserImageAsync(application, usersImage, new AsyncTaskCallback<UsersImage>() {
                                     @Override
                                     public void handleResponse(UsersImage response) {
+                                        Log.d(TAG, "New User, image inserted");
+                                        setUserPicture(base64Image, finalI, posts);
                                         Log.d(TAG, "Utente: " + response.getUid() + " inserito");
                                     }
                                     @Override
@@ -215,5 +211,15 @@ public class PostFragmentViewModel extends AndroidViewModel {
             });
             queue.add(jsonObjectRequestImage);
         }
+    }
+    private void setUserPicture(String base64Image, int position, List<Post> posts){
+        Log.d(TAG, "IMMAGINE INSERITA DA GETIMAGERS: ");
+        byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        //Quanto scritto male, mi fanno male gli occhi. Prendo il post, lo aggiorno e lo aggiungo. Rimetto nel array di mutableLiveData per essere aggiornato anhce nel adapter
+        Post post = allPosts.getValue().get(position);
+        post.setAuthorImage(decodedByte);
+        posts.set(position, post);
+        allPosts.setValue(posts);
     }
 }
