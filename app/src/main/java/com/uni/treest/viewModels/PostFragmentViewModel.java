@@ -169,13 +169,16 @@ public class PostFragmentViewModel extends AndroidViewModel {
                                             byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
                                             Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                                             //Quanto scritto male, mi fanno male gli occhi. Prendo il post, lo aggiorno e lo aggiungo. Rimetto nel array di mutableLiveData per essere aggiornato anhce nel adapter
-                                            allPosts.getValue().get(finalI).setAuthorImage(decodedByte);
+                                            Post post = allPosts.getValue().get(finalI);
+                                            post.setAuthorImage(decodedByte);
+                                            allPosts.getValue().set(finalI, post);
                                             allPosts.setValue(allPosts.getValue());
                                         }
 
                                         @Override
                                         public void handleError(Exception e) {
                                             Log.d(TAG, "User update ERROR: " + e.getMessage());
+
                                         }
                                     }).execute();
                                 }else{
