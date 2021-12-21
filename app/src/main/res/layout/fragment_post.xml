@@ -20,7 +20,7 @@
         app:menu_animationDelayPerItem="50"
         app:menu_backgroundColor="@android:color/transparent"
         app:menu_buttonSpacing="0dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="32dp"
         app:menu_colorNormal="@color/primary"
         app:menu_colorPressed="@color/primaryDark"
         app:menu_colorRipple="#99FFFFFF"

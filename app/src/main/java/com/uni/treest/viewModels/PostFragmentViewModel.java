@@ -17,19 +17,21 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.uni.treest.models.Line;
+import com.uni.treest.Entitys.UsersImage;
+import com.uni.treest.database.AsyncTaskCallback;
+import com.uni.treest.database.asyncRequests.FindUserImageById;
+import com.uni.treest.database.asyncRequests.GetAllUsersImagesAsync;
+import com.uni.treest.database.asyncRequests.InsertUserImageAsync;
+import com.uni.treest.database.asyncRequests.UpdateUserImageAsync;
 import com.uni.treest.models.Post;
-import com.uni.treest.models.Terminus;
 import com.uni.treest.utils.Preferences;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class PostFragmentViewModel extends AndroidViewModel {
@@ -37,6 +39,7 @@ public class PostFragmentViewModel extends AndroidViewModel {
 
     private final Application application;
     private MutableLiveData<List<Post>> allPosts = new MutableLiveData<>();
+    private List<UsersImage> databaseImages = null;
     RequestQueue queue;
 
     public PostFragmentViewModel(@NonNull Application application) {
@@ -56,6 +59,19 @@ public class PostFragmentViewModel extends AndroidViewModel {
     }
 
     private void loadPosts(int did, String sid){
+        //===============================GET ALL IMAGES===================
+        new GetAllUsersImagesAsync(application, new AsyncTaskCallback<List<UsersImage>>() {
+            @Override
+            public void handleResponse(List<UsersImage> response) {
+                databaseImages = response;
+            }
+            @Override
+            public void handleError(Exception e) {
+                Log.d(TAG, "AN ERROR OCCURED: " + e.getMessage());
+            }
+        }).execute();
+        //===============================GET ALL IMAGES===================
+
         List<Post> posts = new ArrayList<>();
         String url = "https://ewserver.di.unimi.it/mobicomp/treest/getPosts.php";
         JSONObject jsonObject = new JSONObject();
@@ -85,14 +101,22 @@ public class PostFragmentViewModel extends AndroidViewModel {
                             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
                             Post post = new Post(delay, status, comment, followingAuthor, format.parse(datetime), authorName, pversion, author);
 
-                            //Line line = new Line(new Terminus(terminusObject1.getString("sname"), terminusObject1.getInt("did"))
-                            //       , new Terminus(terminusObject2.getString("sname"), terminusObject2.getInt("did")));
-
+                            //Aggiungo le immagini che ci sono in DB
+                            for(UsersImage image: databaseImages){
+                                if (image.getUid() == Integer.parseInt(author)){
+                                    if(!image.getImage().equals("null")) { // se l'immagine non è nulla, aggiungila
+                                        byte[] decodedString = Base64.decode(image.getImage(), Base64.DEFAULT);
+                                        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                        post.setAuthorImage(decodedByte);
+                                    }
+                                }
+                            }
                             posts.add(post);
                         }catch (Exception e){
 
                             Log.d(TAG, "ERRORE IN FOR POSTS: " + e.toString());
                         }
+
                         allPosts.setValue(posts);
                     }
                     getUserPicture();
@@ -130,14 +154,51 @@ public class PostFragmentViewModel extends AndroidViewModel {
                 public void onResponse(JSONObject response) {
                     try {
                         String base64Image = response.getString("picture");
-                        byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
-                        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                        //Quanto scritto male, mi fanno male gli occhi. Prendo il post, lo aggiorno e lo aggiungo. Rimetto nel array di mutableLiveData per essere aggiornato anhce nel adapter
-                        Post post = allPosts.getValue().get(finalI);
-                        post.setAuthorImage(decodedByte);
-                        allPosts.getValue().set(finalI, post);
-                        allPosts.setValue(allPosts.getValue());
-                    } catch (JSONException e) {
+                        int imageVersion = Integer.parseInt(response.getString("pversion"));
+                        UsersImage usersImage = new UsersImage(uid, base64Image, imageVersion);
+
+                        new FindUserImageById(application, uid, new AsyncTaskCallback<UsersImage>() {
+                            @Override
+                            public void handleResponse(UsersImage response) {
+                                if(usersImage.getImageVersion() != imageVersion){
+                                    new UpdateUserImageAsync(application, usersImage, new AsyncTaskCallback<UsersImage>() {
+                                        @Override
+                                        public void handleResponse(UsersImage response) {
+                                            Log.d(TAG, "User updated");
+                                            byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
+                                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                            //Quanto scritto male, mi fanno male gli occhi. Prendo il post, lo aggiorno e lo aggiungo. Rimetto nel array di mutableLiveData per essere aggiornato anhce nel adapter
+                                            allPosts.getValue().get(finalI).setAuthorImage(decodedByte);
+                                            allPosts.setValue(allPosts.getValue());
+                                        }
+
+                                        @Override
+                                        public void handleError(Exception e) {
+                                            Log.d(TAG, "User update ERROR: " + e.getMessage());
+                                        }
+                                    }).execute();
+                                }else{
+                                    Log.d(TAG, "Utente: " + uid + " ha la stessa versione di immagine, SKIP");
+                                }
+                            }
+
+                            @Override
+                            public void handleError(Exception e) {
+                                new InsertUserImageAsync(application, usersImage, new AsyncTaskCallback<UsersImage>() {
+                                    @Override
+                                    public void handleResponse(UsersImage response) {
+                                        Log.d(TAG, "Utente: " + response.getUid() + " inserito");
+                                    }
+                                    @Override
+                                    public void handleError(Exception e) {
+                                        Log.d(TAG, "Inserimento utente ERRORE: " + e.getMessage());
+
+                                    }
+                                }).execute();
+                            }
+                        }).execute();
+
+                    } catch (Exception e) {
                         e.printStackTrace();
                         Log.d(TAG, "ERRORE JSON IMAGE: " + e.toString());
                     }

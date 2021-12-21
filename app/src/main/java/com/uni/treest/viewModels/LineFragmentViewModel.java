@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.room.Room;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -15,6 +15,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.uni.treest.database.ImageDatabase;
 import com.uni.treest.models.Line;
 import com.uni.treest.models.Terminus;
 import com.uni.treest.utils.Preferences;
@@ -74,6 +75,7 @@ public class LineFragmentViewModel extends AndroidViewModel {
     }
 
     private void loadLines(String sid){
+
         List<Line> lines = new ArrayList<>();
         String url = "https://ewserver.di.unimi.it/mobicomp/treest/getLines.php";
         JSONObject jsonObject = new JSONObject();
@@ -86,6 +88,10 @@ public class LineFragmentViewModel extends AndroidViewModel {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    ImageDatabase db = Room.databaseBuilder(application,
+                            ImageDatabase.class, "Image.db").build();
+                    //List<UsersImages> images = db.usersDao().getUsersImages().get();
+                    //Log.d(TAG, "LUNGHEZZA DB : " + images.size());
                     JSONArray jsonArray = response.getJSONArray("lines");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject lineObject = jsonArray.getJSONObject(i);
@@ -99,7 +105,7 @@ public class LineFragmentViewModel extends AndroidViewModel {
                     }
                     allLines.setValue(lines);
 
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     Log.d(TAG, "ERRORE: " + e.toString());
                 }
