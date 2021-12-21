@@ -68,6 +68,7 @@ public class PostFragmentViewModel extends AndroidViewModel {
             @Override
             public void handleError(Exception e) {
                 Log.d(TAG, "AN ERROR OCCURED: " + e.getMessage());
+                databaseImages = new ArrayList<>();
             }
         }).execute();
         //===============================GET ALL IMAGES===================
