@@ -1,66 +1,91 @@
 package com.uni.treest.fragments;
 
+
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.JointType;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.RoundCap;
 import com.uni.treest.R;
+import com.uni.treest.models.Station;
+import com.uni.treest.viewModels.MapsFragmentViewModel;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MapsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class MapsFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    public static final String TAG = "MapFragment";
+    private static final String DID = "did";
+    private GoogleMap map;
+    private MapsFragmentViewModel viewModel;
+
+    private int did;
 
     public MapsFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MapsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MapsFragment newInstance(String param1, String param2) {
-        MapsFragment fragment = new MapsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            did = getArguments().getInt(DID);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View fragmentView = inflater.inflate(R.layout.fragment_maps, container, false);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
+        viewModel = new ViewModelProvider(this).get(MapsFragmentViewModel.class);
+        Log.d(TAG, "THE DID IS : " + did);
+        mapFragment.getMapAsync(this);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_maps, container, false);
+        return fragmentView;
+    }
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        map = googleMap;
+        viewModel.getStations(did).observe(getViewLifecycleOwner(), new Observer<List<Station>>() {
+            @Override
+            public void onChanged(List<Station> stations) {
+                LatLng[] lineCoordinates = new LatLng[stations.size()];
+                for (int i = 0; i < stations.size(); i++) {
+                    map.addMarker(new MarkerOptions()
+                            .position(stations.get(i).getLatLng())
+                            .title(stations.get(i).getsName()));
+                    lineCoordinates[i] = stations.get(i).getLatLng();
+                }
+                Polyline connectionLine = googleMap.addPolyline(new PolylineOptions().clickable(true).add(lineCoordinates));
+                connectionLine.setEndCap(new RoundCap());
+                connectionLine.setWidth(16);
+                connectionLine.setColor(0xff1A8D18);
+                connectionLine.setJointType(JointType.DEFAULT);
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(stations.get(0).getLatLng(), 15));
+            }
+        });
+
     }
 }

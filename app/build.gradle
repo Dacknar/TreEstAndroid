@@ -48,6 +48,9 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.3.5'
     testImplementation 'junit:junit:4.13.2'
 
+    //MAPS
+    implementation 'com.google.android.gms:play-services-maps:18.0.1'
+
 
     //Volley
     implementation 'com.android.volley:volley-cronet:1.2.1'

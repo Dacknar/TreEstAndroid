@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.TreEst">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyB7Hc6yNkMrqlQ_tDOwlbL0JWpcIg7tTq8" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

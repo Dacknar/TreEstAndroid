@@ -85,7 +85,7 @@ public class PostFragment extends Fragment {
                     switchDirection();
                     break;
                 case R.id.menu_item_map:
-                    Toast.makeText(getContext(), "Lol, MAPPA", Toast.LENGTH_SHORT).show();
+                    setMap();
                     break;
                 case R.id.menu_item_write:
                     Toast.makeText(getContext(), "Lol, Post", Toast.LENGTH_SHORT).show();
@@ -138,6 +138,14 @@ public class PostFragment extends Fragment {
         getActivity().getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .replace(R.id.containerView, PostFragment.class, args)
+                .commit();
+    }
+    void setMap(){
+        Bundle args = new Bundle();
+        args.putInt("did", did);
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.containerView, MapsFragment.class, args)
                 .commit();
     }
 }
