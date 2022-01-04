@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 import com.uni.treest.R;
 import com.uni.treest.models.Station;
+import com.uni.treest.utils.Preferences;
 import com.uni.treest.viewModels.MapsFragmentViewModel;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private static final String DID = "did";
     private GoogleMap map;
     private MapsFragmentViewModel viewModel;
+    private FloatingActionButton fab;
 
     private int did;
 
@@ -60,14 +63,34 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_maps, container, false);
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-
+        fab = fragmentView.findViewById(R.id.fab_back);
         viewModel = new ViewModelProvider(this).get(MapsFragmentViewModel.class);
         Log.d(TAG, "THE DID IS : " + did);
         mapFragment.getMapAsync(this);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadFragment();
+            }
+        });
         // Inflate the layout for this fragment
         return fragmentView;
     }
-
+    void loadFragment(){
+        int switchedDid = Preferences.getTheInstance().getSwitchedLastDid(getContext());
+        String direction = Preferences.getTheInstance().getDirection(getContext());
+        String switchedDirection = Preferences.getTheInstance().getSwitchedDirection(getContext());
+        Bundle args = new Bundle();
+        args.putInt("did", did);
+        args.putInt("switchedDid", switchedDid);
+        args.putString("direction", direction);
+        args.putString("switchDirection", switchedDirection);
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.containerView, PostFragment.class, args)
+                .commit();
+    }
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;

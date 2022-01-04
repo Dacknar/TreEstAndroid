@@ -17,7 +17,7 @@
 
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/floatingActionMenu"
-        app:menu_animationDelayPerItem="50"
+        app:menu_animationDelayPerItem="70"
         app:menu_backgroundColor="@android:color/transparent"
         app:menu_buttonSpacing="0dp"
         android:layout_marginBottom="32dp"
