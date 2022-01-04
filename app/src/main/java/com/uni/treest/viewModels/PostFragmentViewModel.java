@@ -99,7 +99,7 @@ public class PostFragmentViewModel extends AndroidViewModel {
                             String authorName = lineObject.getString("authorName").equals("unnamed") ? "Senza nome" : lineObject.getString("authorName");
                             String pversion = lineObject.getString("pversion");
                             String author = lineObject.getString("author");
-                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             Post post = new Post(delay, status, comment, followingAuthor, format.parse(datetime), authorName, pversion, author);
 
                             //Aggiungo le immagini che ci sono in DB
@@ -114,7 +114,6 @@ public class PostFragmentViewModel extends AndroidViewModel {
                             }
                             posts.add(post);
                         }catch (Exception e){
-
                             Log.d(TAG, "ERRORE IN FOR POSTS: " + e.toString());
                         }
 

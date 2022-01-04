@@ -1,73 +1,97 @@
 package com.uni.treest.fragments;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.room.Room;
 
+import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.canhub.cropper.CropImage;
 import com.canhub.cropper.CropImageContract;
+import com.canhub.cropper.CropImageView;
+import com.permissionx.guolindev.PermissionX;
+import com.permissionx.guolindev.callback.ExplainReasonCallback;
+import com.permissionx.guolindev.callback.RequestCallback;
+import com.permissionx.guolindev.request.ExplainScope;
 import com.uni.treest.R;
+import com.uni.treest.database.ImageDatabase;
+import com.uni.treest.models.Line;
+import com.uni.treest.models.Terminus;
+import com.uni.treest.utils.Preferences;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ProfileFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public static final String TAG = "ProfileFragment";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
 
     private TextView mSelectImage;
     private Button mDone;
     private CircleImageView mImageView;
     private EditText mName;
+    private String newImage = null;
+    private String lastKnownName = null;
 
     public ProfileFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(String param1, String param2) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            uri -> {
+                try {
+                    if(uri != null) {
+                        Log.d(TAG, "The URI is : " + uri.toString());
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                        Bitmap resizedImage = getResizedBitmap(bitmap, 230);
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        resizedImage.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                        byte[] byteArray = byteArrayOutputStream.toByteArray();
+                        newImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                        mImageView.setImageBitmap(resizedImage);
+                    }
+                } catch (IOException e) {
+                    Log.d(TAG, "ERRORE PER BITMAT: " + e.getMessage());
+                    e.printStackTrace();
+                }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+            });
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,19 +103,84 @@ public class ProfileFragment extends Fragment {
         mDone = fragmentView.findViewById(R.id.profileDone);
         mImageView = fragmentView.findViewById(R.id.profileImageView);
         mSelectImage = fragmentView.findViewById(R.id.profileUpdateImage);
+        lastKnownName = Preferences.getTheInstance().getUserName(getContext());
 
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 3);
-            }
-        };
+        String base64Image = Preferences.getTheInstance().getUserPicture(getContext());
+        byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        mImageView.setImageBitmap(decodedByte);
+
+
+        Log.d(TAG, "SID: " + Preferences.getTheInstance().getSid(getContext()));
+
+        if(lastKnownName.equals("")){
+            mName.setHint("Inserire nome utente");
+            mName.setText("");
+        }else {
+            mName.setText(lastKnownName);
+        }
+
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+
+        View.OnClickListener listener = v -> PermissionX.init(getActivity())
+                .permissions(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .explainReasonBeforeRequest()
+                .onExplainRequestReason((scope, deniedList) -> scope.showRequestReasonDialog(deniedList, "Per caricare l'immagine l'applicazione ha bisogno di questo permesso", "OK", "Anulla"))
+                .request((allGranted, grantedList, deniedList) -> {
+                    if (allGranted) {
+                        Log.d(TAG, "Permission Granted");
+                        mGetContent.launch("image/*");
+                    } else {
+                        Toast.makeText(getContext(), "Accesso alla memoria non consentito", Toast.LENGTH_LONG).show();
+                    }
+                });
 
         mImageView.setOnClickListener(listener);
         mSelectImage.setOnClickListener(listener);
+
+
+        mDone.setOnClickListener(view -> {
+            if(newImage != null || !mName.getText().toString().equals(lastKnownName)){
+                loadUser(queue);
+            }else{
+                Toast.makeText(getContext(), "ERRORE: Modificare uno dei due parametri per aggiornare", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return fragmentView;
+    }
+    private void loadUser(RequestQueue requestQueue){
+        String url = "https://ewserver.di.unimi.it/mobicomp/treest/setProfile.php";
+        String sid = Preferences.getTheInstance().getSid(getContext());
+        String name = mName.getText().toString();
+        JSONObject jsonObjectUser = new JSONObject();
+        try {
+            jsonObjectUser.put("sid", sid);
+            jsonObjectUser.put("name", name);
+            jsonObjectUser.put("picture", newImage);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObjectUser, response -> {
+            Preferences.getTheInstance().setUserName(getContext(),name);
+            Preferences.getTheInstance().setUserPicture(getContext(),newImage);
+            Toast.makeText(getContext(), "Dati aggiornati", Toast.LENGTH_SHORT).show();
+        }, error -> Log.d(TAG, "ERROR: " + error.toString()));
+        requestQueue.add(jsonObjectRequest);
+
+    }
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float)width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
     }
 }

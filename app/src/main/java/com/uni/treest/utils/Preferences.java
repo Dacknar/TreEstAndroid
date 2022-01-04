@@ -13,7 +13,8 @@ public class Preferences {
     private final String SESSION_ID = "sid";
     private final String DIRECTION = "direction";
     private final String SWITCH_DIRECTION = "switchedDirection";
-
+    private final String USER_PICTURE = "picture";
+    private final String USER_NAME = "userName";
 
 
     private static Preferences theInstance = null;
@@ -56,6 +57,26 @@ public class Preferences {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(SWITCHED_DID, did);
         editor.apply();
+    }
+    public void setUserPicture(Context context, String picture){
+        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(USER_PICTURE, picture);
+        editor.apply();
+    }
+    public String getUserPicture(Context context){
+        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        return sharedPref.getString(USER_PICTURE, "");
+    }
+    public void setUserName(Context context, String picture){
+        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(USER_NAME, picture);
+        editor.apply();
+    }
+    public String getUserName(Context context){
+        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        return sharedPref.getString(USER_NAME, "");
     }
     public String getSid(Context context){
         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);

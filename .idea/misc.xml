@@ -4,8 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.178125" />
+        <entry key="..\:/Users/User/StudioProjects/TreEstAndroid/app/src/main/res/drawable/ic_finish.xml" value="0.2535" />
         <entry key="..\:/Users/User/StudioProjects/TreEstAndroid/app/src/main/res/layout/fragment_maps.xml" value="0.24791666666666667" />
         <entry key="..\:/Users/User/StudioProjects/TreEstAndroid/app/src/main/res/layout/fragment_post.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/User/StudioProjects/TreEstAndroid/app/src/main/res/layout/fragment_profile.xml" value="0.5" />
         <entry key="..\:/Users/User/StudioProjects/TreEstAndroid/app/src/main/res/layout/recycler_posts_item.xml" value="0.67" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.26011823571246595" />
         <entry key="app/src/main/res/layout/fragment_lines.xml" value="0.14427083333333332" />

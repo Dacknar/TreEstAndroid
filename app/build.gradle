@@ -51,6 +51,8 @@ dependencies {
     //MAPS
     implementation 'com.google.android.gms:play-services-maps:18.0.1'
 
+    //Permissions
+    implementation 'com.guolindev.permissionx:permissionx:1.6.1'
 
     //Volley
     implementation 'com.android.volley:volley-cronet:1.2.1'
@@ -58,7 +60,6 @@ dependencies {
     //RoundedImageView
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
-    implementation 'com.github.CanHub:Android-Image-Cropper:4.0.0'
 
     //Floating Action button
     implementation 'com.github.clans:fab:1.6.4'

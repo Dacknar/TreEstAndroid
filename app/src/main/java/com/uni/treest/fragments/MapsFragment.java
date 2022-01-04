@@ -1,6 +1,7 @@
 package com.uni.treest.fragments;
 
 
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -72,6 +75,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onChanged(List<Station> stations) {
                 LatLng[] lineCoordinates = new LatLng[stations.size()];
+
                 for (int i = 0; i < stations.size(); i++) {
                     map.addMarker(new MarkerOptions()
                             .position(stations.get(i).getLatLng())

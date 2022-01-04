@@ -88,10 +88,6 @@ public class LineFragmentViewModel extends AndroidViewModel {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    ImageDatabase db = Room.databaseBuilder(application,
-                            ImageDatabase.class, "Image.db").build();
-                    //List<UsersImages> images = db.usersDao().getUsersImages().get();
-                    //Log.d(TAG, "LUNGHEZZA DB : " + images.size());
                     JSONArray jsonArray = response.getJSONArray("lines");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject lineObject = jsonArray.getJSONObject(i);

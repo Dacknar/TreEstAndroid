@@ -78,7 +78,8 @@ public class Post {
     }
 
     public String getPostDate() {
-        return "pubblicato il: "+postDate.getDay()+"/"+postDate.getMonth()+"/"+postDate.getYear()+" alle ore: "+postDate.getHours()+":"+postDate.getMinutes();
+        String updatedMinute = postDate.getMinutes() < 10 ? "0" + postDate.getMinutes() : "" + postDate.getMinutes();
+        return "pubblicato il: " + (postDate.getDay() +1 ) + "/" +(postDate.getMonth() +1 ) + "/" +(postDate.getYear() - 100) + " alle ore: "+postDate.getHours()+":"+updatedMinute;
     }
 
     public String getAuthorName() {
