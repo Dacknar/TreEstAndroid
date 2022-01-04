@@ -26,7 +26,7 @@ public class UpdateUserImageAsync extends AsyncTask<Integer, Void, UsersImage> {
         exception = null;
 
         try{
-           ImageDatabase.getInstance(context).usersDao().insertUserImage(this.usersImage);
+           ImageDatabase.getInstance(context).usersDao().updateUserImage(this.usersImage);
         }catch (Exception e){
             exception = e;
         }

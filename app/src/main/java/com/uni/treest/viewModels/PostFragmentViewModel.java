@@ -160,7 +160,8 @@ public class PostFragmentViewModel extends AndroidViewModel {
                         new FindUserImageById(application, uid, new AsyncTaskCallback<UsersImage>() {
                             @Override
                             public void handleResponse(UsersImage response) {
-                                if(usersImage.getImageVersion() != imageVersion){
+                                Log.d(TAG, "Immagein corrente : " + response.getImageVersion() + " Immageine atuale: " + imageVersion);
+                                if(response.getImageVersion() != imageVersion){
                                     new UpdateUserImageAsync(application, usersImage, new AsyncTaskCallback<UsersImage>() {
                                         @Override
                                         public void handleResponse(UsersImage response) {
