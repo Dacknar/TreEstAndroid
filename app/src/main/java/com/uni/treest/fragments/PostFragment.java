@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.uni.treest.OnFollowClick;
 import com.uni.treest.R;
 import com.uni.treest.adapters.MainAdapter;
 import com.uni.treest.adapters.PostsAdapter;
@@ -23,12 +24,7 @@ import com.uni.treest.utils.Preferences;
 import com.uni.treest.viewModels.LineFragmentViewModel;
 import com.uni.treest.viewModels.PostFragmentViewModel;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PostFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class PostFragment extends Fragment {
+public class PostFragment extends Fragment implements OnFollowClick{
 
     public static final String TAG = "PostFragment";
     // TODO: Rename parameter arguments, choose names that match
@@ -50,20 +46,10 @@ public class PostFragment extends Fragment {
     private int switchedDid;
     private String direction;
     private String switchDirection;
+    private PostFragmentViewModel viewModel;
 
     public PostFragment() {
         // Required empty public constructor
-    }
-
-    public static PostFragment newInstance(int did, int switchedDid, String direction, String switchDirection) {
-        PostFragment fragment = new PostFragment();
-        Bundle args = new Bundle();
-        args.putInt(DID_PARAM, did);
-        args.putString(DIRECTION, direction);
-        args.putString(SWITCH_DIRECTION, switchDirection);
-        args.putInt(SWITCHED_DID_PARAM, switchedDid);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -115,10 +101,10 @@ public class PostFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(direction);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        PostFragmentViewModel viewModel = new ViewModelProvider(this).get(PostFragmentViewModel.class);
+        viewModel = new ViewModelProvider(this).get(PostFragmentViewModel.class);
 
 
-        PostsAdapter adapter = new PostsAdapter(Preferences.getTheInstance().getUserID(getContext()));
+        PostsAdapter adapter = new PostsAdapter(Preferences.getTheInstance().getUserID(getContext()), this);
         recyclerView.setAdapter(adapter);
 
         viewModel.getPosts(did, switchedDid, direction,switchDirection).observe(getViewLifecycleOwner(), posts -> {
@@ -153,5 +139,10 @@ public class PostFragment extends Fragment {
                 .setReorderingAllowed(true)
                 .replace(R.id.containerView, AddPostFragment.class, null)
                 .commit();
+    }
+
+    @Override
+    public void OnFollowClick(int authorId, boolean isFollowing) {
+        viewModel.performFollow(authorId, isFollowing);
     }
 }

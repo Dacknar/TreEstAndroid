@@ -66,8 +66,16 @@ public class Post {
         }
     }
 
+    public void setFollowingAuthor(boolean followingAuthor) {
+        this.followingAuthor = followingAuthor;
+    }
+
     public String getComment() {
         return comment;
+    }
+
+    public boolean isFollowing(){
+        return followingAuthor;
     }
 
     public String isFollowingAuthor() {

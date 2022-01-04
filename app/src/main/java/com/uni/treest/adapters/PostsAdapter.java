@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.uni.treest.OnFollowClick;
 import com.uni.treest.R;
 import com.uni.treest.models.Line;
 import com.uni.treest.models.Post;
@@ -23,10 +24,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     private List<Post> postList = new ArrayList<>();
     private String userId;
+    private OnFollowClick onFollowClick;
 
-    public PostsAdapter(String userId) {
+    public PostsAdapter(String userId, OnFollowClick onFollowClick) {
         this.userId = userId;
-        Log.d("PostFragment", "uID is: " + userId);
+        this.onFollowClick = onFollowClick;
     }
 
     public void setPosts(List<Post> allPosts){
@@ -39,7 +41,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycler_posts_item, parent, false);
-
         return new PostsAdapter.ViewHolder(view);
     }
 
@@ -48,13 +49,24 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.authorName.setText(postList.get(position).getAuthorName());
         holder.publishedDate.setText(postList.get(position).getPostDate());
         holder.follow.setText(postList.get(position).isFollowingAuthor());
+
         if (postList.get(position).getAuthorID().equals(userId)){
             holder.follow.setVisibility(View.GONE);
+        }else{
+            holder.follow.setVisibility(View.VISIBLE);
+            holder.follow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onFollowClick.OnFollowClick(Integer.parseInt(postList.get(holder.getAdapterPosition()).getAuthorID()), postList.get(holder.getAdapterPosition()).isFollowing());
+                }
+            });
         }
+
         holder.state.setText(postList.get(position).getStatus());
         holder.delay.setText(postList.get(position).getDelay());
         holder.comment.setText(postList.get(position).getComment());
         holder.authorImage.setImageBitmap(postList.get(position).getAuthorImage());
+
     }
 
     @Override

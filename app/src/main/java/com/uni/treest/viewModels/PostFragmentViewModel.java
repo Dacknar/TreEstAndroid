@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -18,6 +19,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.uni.treest.Entitys.UsersImage;
+import com.uni.treest.OnFollowClick;
 import com.uni.treest.database.AsyncTaskCallback;
 import com.uni.treest.database.asyncRequests.FindUserImageById;
 import com.uni.treest.database.asyncRequests.GetAllUsersImagesAsync;
@@ -46,6 +48,41 @@ public class PostFragmentViewModel extends AndroidViewModel {
         super(application);
         this.application=application;
         queue = Volley.newRequestQueue(application);
+    }
+
+    public void performFollow(int authorId, boolean isFollowing){
+        String url = isFollowing ? "https://ewserver.di.unimi.it/mobicomp/treest/unfollow.php" : "https://ewserver.di.unimi.it/mobicomp/treest/follow.php";
+        String sid = Preferences.getTheInstance().getSid(application);
+        String uid = String.valueOf(authorId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("sid", sid);
+            jsonObject.put("uid", uid);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                for(int i = 0; i< allPosts.getValue().size(); i++){
+                    if(allPosts.getValue().get(i).getAuthorID().equals(String.valueOf(authorId))){
+                        allPosts.getValue().get(i).setFollowingAuthor(!isFollowing);
+                        allPosts.setValue(allPosts.getValue());
+                    }
+                }
+                if (isFollowing) {
+                    Toast.makeText(application, "Unfollow utente", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(application, "Follow utente", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "ERROR:VOLLEY " + error.toString());
+            }
+        });
+        queue.add(jsonObjectRequest);
     }
 
     public LiveData<List<Post>> getPosts(int did, int switchedDid, String direction ,String switchDirection){
