@@ -118,7 +118,7 @@ public class PostFragment extends Fragment {
         PostFragmentViewModel viewModel = new ViewModelProvider(this).get(PostFragmentViewModel.class);
 
 
-        PostsAdapter adapter = new PostsAdapter();
+        PostsAdapter adapter = new PostsAdapter(Preferences.getTheInstance().getUserID(getContext()));
         recyclerView.setAdapter(adapter);
 
         viewModel.getPosts(did, switchedDid, direction,switchDirection).observe(getViewLifecycleOwner(), posts -> {

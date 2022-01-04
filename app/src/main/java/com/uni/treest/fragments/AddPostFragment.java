@@ -106,6 +106,7 @@ public class AddPostFragment extends Fragment {
                     }
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObjectUser, response -> {
                         Toast.makeText(getContext(), "Post inserito con successo", Toast.LENGTH_SHORT).show();
+                        loadFragment();
                     }, error -> Log.d(TAG, "ERROR: " + error.toString()));
                     queue.add(jsonObjectRequest);
                 }

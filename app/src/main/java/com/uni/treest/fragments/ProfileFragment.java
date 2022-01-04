@@ -72,10 +72,9 @@ public class ProfileFragment extends Fragment {
 
     ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
             uri -> {
-                Log.d(TAG, "The URI is : " + uri.toString());
-
                 try {
                     if(uri != null) {
+                        Log.d(TAG, "The URI is : " + uri.toString());
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
                         Bitmap resizedImage = getResizedBitmap(bitmap, 230);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -109,7 +108,7 @@ public class ProfileFragment extends Fragment {
         mImageView.setImageBitmap(decodedByte);
 
 
-        Log.d(TAG, "SID: " + Preferences.getTheInstance().getSid(getContext()));
+        Log.d(TAG, "SID: " + Preferences.getTheInstance().getSid(getContext()) + " UID: " + Preferences.getTheInstance().getUserID(getContext()));
 
         if(lastKnownName.equals("")){
             mName.setHint("Inserire nome utente");

@@ -138,6 +138,8 @@ public class PostFragmentViewModel extends AndroidViewModel {
     void getUserPicture() {
         String sid = Preferences.getTheInstance().getSid(application);
         List<Post> posts = allPosts.getValue();
+        List<Integer> repeatedImages = new ArrayList<>();
+
         for (int i = 0; i < allPosts.getValue().size(); i++) {
             int uid = Integer.parseInt(posts.get(i).getAuthorID());
             String url = "https://ewserver.di.unimi.it/mobicomp/treest/getUserPicture.php";
@@ -156,7 +158,6 @@ public class PostFragmentViewModel extends AndroidViewModel {
                         String base64Image = response.getString("picture");
                         int imageVersion = Integer.parseInt(response.getString("pversion"));
                         UsersImage usersImage = new UsersImage(uid, base64Image, imageVersion);
-
                         new FindUserImageById(application, uid, new AsyncTaskCallback<UsersImage>() {
                             @Override
                             public void handleResponse(UsersImage response) {
@@ -176,6 +177,11 @@ public class PostFragmentViewModel extends AndroidViewModel {
                                         }
                                     }).execute();
                                 }else{
+                                    //Il caso in cui l'utente è stato inserito ma si presenta più di una volta
+                                    if(repeatedImages.contains(response.getUid())){
+                                        Log.d(TAG, "CONTAINS: ");
+                                        setUserPicture(base64Image, finalI, posts);
+                                    }
                                     Log.d(TAG, "Utente: " + uid + " ha la stessa versione di immagine, SKIP");
                                 }
                             }
@@ -187,6 +193,7 @@ public class PostFragmentViewModel extends AndroidViewModel {
                                     public void handleResponse(UsersImage response) {
                                         Log.d(TAG, "New User, image inserted");
                                         setUserPicture(base64Image, finalI, posts);
+                                        repeatedImages.add(response.getUid());
                                         Log.d(TAG, "Utente: " + response.getUid() + " inserito");
                                     }
                                     @Override

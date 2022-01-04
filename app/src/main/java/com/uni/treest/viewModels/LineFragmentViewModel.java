@@ -53,14 +53,43 @@ public class LineFragmentViewModel extends AndroidViewModel {
         return allLines;
     }
     private void registerUser(){
-        String url = "https://ewserver.di.unimi.it/mobicomp/treest/register.php";
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        Log.d(TAG, "REGISTERING: ");
+        String urlRegister = "https://ewserver.di.unimi.it/mobicomp/treest/register.php";
+        JsonObjectRequest jsonObjectRequestRegister = new JsonObjectRequest(urlRegister, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(JSONObject responseRegister) {
                 try {
-                    String sid = response.getString("sid");
-                    Preferences.getTheInstance().setFirstRunAndSid(application, sid);
-                    loadLines(sid);
+                    String sid = responseRegister.getString("sid");
+                    Log.d(TAG, "REGISTERED, GETTING PROFILE: ");
+                    String urlProfile = "https://ewserver.di.unimi.it/mobicomp/treest/getProfile.php";
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("sid", sid);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, urlProfile, jsonObject, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                Log.d(TAG, "PROFILE GOT: ");
+                                String userId = response.getString("uid");
+                                Preferences.getTheInstance().setUserID(application, userId);
+                                Preferences.getTheInstance().setFirstRunAndSid(application, sid);
+                                Log.d(TAG, "Used ID is : " + userId + " And SID: " + sid);
+                                loadLines(sid);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Log.d(TAG, "ERRORE: " + e.toString());
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, "ERROR: " + error.toString());
+                        }
+                    });
+                    queue.add(jsonObjectRequest);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -71,11 +100,10 @@ public class LineFragmentViewModel extends AndroidViewModel {
                 Log.d(TAG, "ERROR: " + error.toString());
             }
         });
-        queue.add(jsonObjectRequest);
+        queue.add(jsonObjectRequestRegister);
     }
 
     private void loadLines(String sid){
-
         List<Line> lines = new ArrayList<>();
         String url = "https://ewserver.di.unimi.it/mobicomp/treest/getLines.php";
         JSONObject jsonObject = new JSONObject();
@@ -94,7 +122,6 @@ public class LineFragmentViewModel extends AndroidViewModel {
                         Log.d(TAG, ": Element " + lineObject.toString());
                         JSONObject terminusObject1 = lineObject.getJSONObject("terminus1");
                         JSONObject terminusObject2 = lineObject.getJSONObject("terminus2");
-
                         Line line = new Line(new Terminus(terminusObject1.getString("sname"), terminusObject1.getInt("did"))
                                 , new Terminus(terminusObject2.getString("sname"), terminusObject2.getInt("did")));
                         lines.add(line);

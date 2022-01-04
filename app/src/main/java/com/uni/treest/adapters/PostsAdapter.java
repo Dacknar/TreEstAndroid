@@ -22,10 +22,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     private List<Post> postList = new ArrayList<>();
+    private String userId;
+
+    public PostsAdapter(String userId) {
+        this.userId = userId;
+        Log.d("PostFragment", "uID is: " + userId);
+    }
 
     public void setPosts(List<Post> allPosts){
         postList = new ArrayList<>(allPosts);
-       notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -42,6 +48,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.authorName.setText(postList.get(position).getAuthorName());
         holder.publishedDate.setText(postList.get(position).getPostDate());
         holder.follow.setText(postList.get(position).isFollowingAuthor());
+        if (postList.get(position).getAuthorID().equals(userId)){
+            holder.follow.setVisibility(View.GONE);
+        }
         holder.state.setText(postList.get(position).getStatus());
         holder.delay.setText(postList.get(position).getDelay());
         holder.comment.setText(postList.get(position).getComment());

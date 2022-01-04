@@ -15,6 +15,7 @@ public class Preferences {
     private final String SWITCH_DIRECTION = "switchedDirection";
     private final String USER_PICTURE = "picture";
     private final String USER_NAME = "userName";
+    private final String USER_ID = "userID";
 
 
     private static Preferences theInstance = null;
@@ -45,6 +46,16 @@ public class Preferences {
     public int getSwitchedLastDid(Context context){
         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         return sharedPref.getInt(SWITCHED_DID, -1); // -1 IF First run with no selected DID.
+    }
+    public void setUserID(Context context, String userId){
+        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(USER_ID, userId);
+        editor.apply();
+    }
+    public String getUserID(Context context){
+        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        return sharedPref.getString(USER_ID, ""); // -1 IF First run with no selected DID.
     }
     public void setDid(Context context, int did){
         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
