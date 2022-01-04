@@ -72,9 +72,10 @@ public class ProfileFragment extends Fragment {
 
     ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
             uri -> {
+                Log.d(TAG, "The URI is : " + uri.toString());
+
                 try {
                     if(uri != null) {
-                        Log.d(TAG, "The URI is : " + uri.toString());
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
                         Bitmap resizedImage = getResizedBitmap(bitmap, 230);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -160,7 +161,9 @@ public class ProfileFragment extends Fragment {
         }
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObjectUser, response -> {
             Preferences.getTheInstance().setUserName(getContext(),name);
-            Preferences.getTheInstance().setUserPicture(getContext(),newImage);
+            if(newImage != null){
+                Preferences.getTheInstance().setUserPicture(getContext(),newImage);
+            }
             Toast.makeText(getContext(), "Dati aggiornati", Toast.LENGTH_SHORT).show();
         }, error -> Log.d(TAG, "ERROR: " + error.toString()));
         requestQueue.add(jsonObjectRequest);

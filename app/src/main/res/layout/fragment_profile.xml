@@ -36,6 +36,7 @@
         android:layout_marginTop="8dp"
         android:minHeight="48dp"
         android:text="Nome Utente"
+        android:maxLength="19"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileUpdateImage" />

@@ -3,4 +3,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="shared_first_run">firstRun</string>
+    <string name="selectDelay">Selezionare ritardo</string>
+    <string name="selectState">Selezionare stato</string>
+    <string name="writeComment">Lasciare un commento</string>
+
 </resources>

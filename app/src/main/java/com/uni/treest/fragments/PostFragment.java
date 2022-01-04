@@ -88,7 +88,7 @@ public class PostFragment extends Fragment {
                     setMap();
                     break;
                 case R.id.menu_item_write:
-                    Toast.makeText(getContext(), "Lol, Post", Toast.LENGTH_SHORT).show();
+                    loadAdPost();
                     break;
             }
         }
@@ -141,11 +141,17 @@ public class PostFragment extends Fragment {
                 .commit();
     }
     void setMap(){
-        Bundle args = new Bundle();
-        args.putInt("did", did);
+            Bundle args = new Bundle();
+            args.putInt("did", did);
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .setReorderingAllowed(true)
+                    .replace(R.id.containerView, MapsFragment.class, args)
+                .commit();
+    }
+    void loadAdPost(){
         getActivity().getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
-                .replace(R.id.containerView, MapsFragment.class, args)
+                .replace(R.id.containerView, AddPostFragment.class, null)
                 .commit();
     }
 }
