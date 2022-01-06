@@ -204,6 +204,8 @@ public class PostFragmentViewModel extends AndroidViewModel {
                                         @Override
                                         public void handleResponse(UsersImage response) {
                                             Log.d(TAG, "User updated, image updated");
+                                            //Aggiungo alla lista l'ID dell'utente con l'immagine aggiornata così che si aggiornino i prossimi post con l'immagine nuova presente.
+                                            repeatedImages.add(response.getUid());
                                             setUserPicture(base64Image, finalI, posts);
                                         }
 

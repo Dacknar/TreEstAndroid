@@ -6,5 +6,7 @@
     <string name="selectDelay">Selezionare ritardo</string>
     <string name="selectState">Selezionare stato</string>
     <string name="writeComment">Lasciare un commento</string>
+    <string name="userName">Nome utente</string>
+
 
 </resources>

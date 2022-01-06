@@ -29,26 +29,39 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileImageView" />
 
-    <EditText
-        android:id="@+id/profileName"
-        android:layout_width="200dp"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout3"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:minHeight="48dp"
-        android:text="Nome Utente"
-        android:maxLength="19"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/writeComment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profileUpdateImage" />
+        app:layout_constraintTop_toBottomOf="@+id/profileUpdateImage" >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/profileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLength="19"
+            android:maxLines="1"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/profileDone"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
+        android:paddingLeft="100dp"
+        android:paddingRight="100dp"
         android:layout_marginTop="32dp"
         android:layout_height="wrap_content"
         android:text="Aggiorna"
-        app:layout_constraintEnd_toEndOf="@+id/profileName"
-        app:layout_constraintStart_toStartOf="@+id/profileName"
-        app:layout_constraintTop_toBottomOf="@+id/profileName" />
+        app:layout_constraintEnd_toEndOf="@+id/textInputLayout3"
+        app:layout_constraintStart_toStartOf="@+id/textInputLayout3"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,7 @@ package com.uni.treest.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,6 +35,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.textfield.TextInputEditText;
 import com.permissionx.guolindev.PermissionX;
 import com.permissionx.guolindev.callback.ExplainReasonCallback;
 import com.permissionx.guolindev.callback.RequestCallback;
@@ -62,7 +65,7 @@ public class ProfileFragment extends Fragment {
     private TextView mSelectImage;
     private Button mDone;
     private CircleImageView mImageView;
-    private EditText mName;
+    private TextInputEditText mName;
     private String newImage = null;
     private String lastKnownName = null;
 
@@ -141,6 +144,7 @@ public class ProfileFragment extends Fragment {
                 loadUser(queue);
             }else{
                 Toast.makeText(getContext(), "ERRORE: Modificare uno dei due parametri per aggiornare", Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -162,6 +166,12 @@ public class ProfileFragment extends Fragment {
             Preferences.getTheInstance().setUserName(getContext(),name);
             if(newImage != null){
                 Preferences.getTheInstance().setUserPicture(getContext(),newImage);
+            }
+            InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            View currVierw = getActivity().getCurrentFocus();
+            if(currVierw != null){
+                imm.hideSoftInputFromWindow(currVierw.getWindowToken(), 0);
+                currVierw.clearFocus();
             }
             Toast.makeText(getContext(), "Dati aggiornati", Toast.LENGTH_SHORT).show();
         }, error -> Log.d(TAG, "ERROR: " + error.toString()));
