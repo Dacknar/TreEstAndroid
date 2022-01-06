@@ -114,7 +114,6 @@ public class ProfileFragment extends Fragment {
         Log.d(TAG, "SID: " + Preferences.getTheInstance().getSid(getContext()) + " UID: " + Preferences.getTheInstance().getUserID(getContext()));
 
         if(lastKnownName.equals("")){
-            mName.setHint("Inserire nome utente");
             mName.setText("");
         }else {
             mName.setText(lastKnownName);

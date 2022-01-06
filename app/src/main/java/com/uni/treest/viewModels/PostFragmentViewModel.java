@@ -1,13 +1,16 @@
 package com.uni.treest.viewModels;
 
+import android.app.Activity;
 import android.app.Application;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -20,11 +23,13 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.uni.treest.Entitys.UsersImage;
 import com.uni.treest.OnFollowClick;
+import com.uni.treest.R;
 import com.uni.treest.database.AsyncTaskCallback;
 import com.uni.treest.database.asyncRequests.FindUserImageById;
 import com.uni.treest.database.asyncRequests.GetAllUsersImagesAsync;
 import com.uni.treest.database.asyncRequests.InsertUserImageAsync;
 import com.uni.treest.database.asyncRequests.UpdateUserImageAsync;
+import com.uni.treest.fragments.PostFragment;
 import com.uni.treest.models.Post;
 import com.uni.treest.utils.Preferences;
 
@@ -151,7 +156,21 @@ public class PostFragmentViewModel extends AndroidViewModel {
                             }
                             posts.add(post);
                         }catch (Exception e){
-                            Log.d(TAG, "ERRORE IN FOR POSTS: " + e.toString());
+                            Log.e(TAG, "ERRORE IN FOR POSTS: " + e.toString());
+                            //In caso di errore ricarico il fragment.
+                            int did = Preferences.getTheInstance().getLastDid(application);
+                            int switchedDid = Preferences.getTheInstance().getSwitchedLastDid(application);
+                            String direction = Preferences.getTheInstance().getDirection(application);
+                            String switchedDirection = Preferences.getTheInstance().getSwitchedDirection(application);
+                            Bundle args = new Bundle();
+                            args.putInt("did", did);
+                            args.putInt("switchedDid", switchedDid);
+                            args.putString("direction", direction);
+                            args.putString("switchDirection", switchedDirection);
+                            ((FragmentActivity)application.getApplicationContext()).getSupportFragmentManager().beginTransaction()
+                                    .setReorderingAllowed(true)
+                                    .replace(R.id.containerView, PostFragment.class, args)
+                                    .commit();
                         }
 
                         allPosts.setValue(posts);
