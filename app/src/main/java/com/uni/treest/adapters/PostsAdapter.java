@@ -1,5 +1,6 @@
 package com.uni.treest.adapters;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,6 +54,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         if (postList.get(position).getAuthorID().equals(userId)){
             holder.follow.setVisibility(View.GONE);
         }else{
+            if(postList.get(position).isFollowing()){
+                holder.follow.setBackgroundColor(Color.parseColor("#1A8D18"));
+            }else{
+                holder.follow.setBackgroundColor(Color.parseColor("#68BB66"));
+
+            }
             holder.follow.setVisibility(View.VISIBLE);
             holder.follow.setOnClickListener(new View.OnClickListener() {
                 @Override
