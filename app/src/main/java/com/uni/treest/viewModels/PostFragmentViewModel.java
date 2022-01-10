@@ -116,6 +116,8 @@ public class PostFragmentViewModel extends AndroidViewModel {
         //===============================GET ALL IMAGES===================
 
         List<Post> posts = new ArrayList<>();
+        List<Post> followerPosts = new ArrayList<>();
+        List<Post> restOfPosts = new ArrayList<>();
         String url = "https://ewserver.di.unimi.it/mobicomp/treest/getPosts.php";
         JSONObject jsonObject = new JSONObject();
         try {
@@ -154,7 +156,11 @@ public class PostFragmentViewModel extends AndroidViewModel {
                                     }
                                 }
                             }
-                            posts.add(post);
+                            if(followingAuthor){
+                                followerPosts.add(post);
+                            }else {
+                                restOfPosts.add(post);
+                            }
                         }catch (Exception e){
                             Log.e(TAG, "ERRORE IN FOR POSTS: " + e.toString());
                             //In caso di errore ricarico il fragment.
@@ -173,8 +179,10 @@ public class PostFragmentViewModel extends AndroidViewModel {
                                     .commit();
                         }
 
-                        allPosts.setValue(posts);
                     }
+                    posts.addAll(followerPosts);
+                    posts.addAll(restOfPosts);
+                    allPosts.setValue(posts);
                     getUserPicture();
 
                 } catch (JSONException e) {
