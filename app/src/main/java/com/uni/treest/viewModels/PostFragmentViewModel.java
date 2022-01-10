@@ -173,7 +173,7 @@ public class PostFragmentViewModel extends AndroidViewModel {
                             args.putInt("switchedDid", switchedDid);
                             args.putString("direction", direction);
                             args.putString("switchDirection", switchedDirection);
-                            ((FragmentActivity)application.getApplicationContext()).getSupportFragmentManager().beginTransaction()
+                            ((FragmentActivity)(Activity)application.getApplicationContext()).getSupportFragmentManager().beginTransaction()
                                     .setReorderingAllowed(true)
                                     .replace(R.id.containerView, PostFragment.class, args)
                                     .commit();

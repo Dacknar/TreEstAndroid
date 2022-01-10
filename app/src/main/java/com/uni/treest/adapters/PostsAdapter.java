@@ -1,6 +1,9 @@
 package com.uni.treest.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,12 +12,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.uni.treest.OnFollowClick;
 import com.uni.treest.R;
 import com.uni.treest.models.Line;
 import com.uni.treest.models.Post;
+import com.uni.treest.utils.Preferences;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +77,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.state.setText(postList.get(position).getStatus());
         holder.delay.setText(postList.get(position).getDelay());
         holder.comment.setText(postList.get(position).getComment());
-        holder.authorImage.setImageBitmap(postList.get(position).getAuthorImage());
+        if(postList.get(position).getAuthorImage() != null){
+            holder.authorImage.setImageBitmap(postList.get(position).getAuthorImage());
+
+        }else {
+            byte[] decodedString = Base64.decode(Preferences.placeHolder, Base64.DEFAULT);
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            holder.authorImage.setImageBitmap(decodedByte);
+        }
 
     }
 
