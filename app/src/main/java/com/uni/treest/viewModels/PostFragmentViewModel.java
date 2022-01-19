@@ -37,6 +37,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -131,8 +132,8 @@ public class PostFragmentViewModel extends AndroidViewModel {
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray jsonArray = response.getJSONArray("posts");
+                    Log.d(TAG, "POSTS LENGTHS: " + jsonArray.toString());
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        try {
                             JSONObject lineObject = jsonArray.getJSONObject(i);
                             //Log.d(TAG, ": Element " + lineObject.toString());
                             int delay =  lineObject.isNull("delay") ? 10 : lineObject.getInt("delay");
@@ -147,37 +148,22 @@ public class PostFragmentViewModel extends AndroidViewModel {
                             Post post = new Post(delay, status, comment, followingAuthor, format.parse(datetime), authorName, pversion, author);
 
                             //Aggiungo le immagini che ci sono in DB
-                            for(UsersImage image: databaseImages){
-                                if (image.getUid() == Integer.parseInt(author)){
-                                    if(!image.getImage().equals("null")) { // se l'immagine non è nulla, aggiungila
+                        if(databaseImages != null) {
+                            for (UsersImage image : databaseImages) {
+                                if (image.getUid() == Integer.parseInt(author)) {
+                                    if (!image.getImage().equals("null")) { // se l'immagine non è nulla, aggiungila
                                         byte[] decodedString = Base64.decode(image.getImage(), Base64.DEFAULT);
                                         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                                         post.setAuthorImage(decodedByte);
                                     }
                                 }
                             }
+                        }
                             if(followingAuthor){
                                 followerPosts.add(post);
                             }else {
                                 restOfPosts.add(post);
                             }
-                        }catch (Exception e){
-                            Log.e(TAG, "ERRORE IN FOR POSTS: " + e.toString());
-                            //In caso di errore ricarico il fragment.
-                            int did = Preferences.getTheInstance().getLastDid(application);
-                            int switchedDid = Preferences.getTheInstance().getSwitchedLastDid(application);
-                            String direction = Preferences.getTheInstance().getDirection(application);
-                            String switchedDirection = Preferences.getTheInstance().getSwitchedDirection(application);
-                            Bundle args = new Bundle();
-                            args.putInt("did", did);
-                            args.putInt("switchedDid", switchedDid);
-                            args.putString("direction", direction);
-                            args.putString("switchDirection", switchedDirection);
-                            ((FragmentActivity)(Activity)application.getApplicationContext()).getSupportFragmentManager().beginTransaction()
-                                    .setReorderingAllowed(true)
-                                    .replace(R.id.containerView, PostFragment.class, args)
-                                    .commit();
-                        }
 
                     }
                     posts.addAll(followerPosts);
@@ -185,7 +171,7 @@ public class PostFragmentViewModel extends AndroidViewModel {
                     allPosts.setValue(posts);
                     getUserPicture();
 
-                } catch (JSONException e) {
+                } catch (JSONException | ParseException e) {
                     e.printStackTrace();
                     Log.d(TAG, "ERRORE JSON ON POSTS: " + e.toString());
                 }

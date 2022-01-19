@@ -1,6 +1,7 @@
 package com.uni.treest.models;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.util.Date;
 
@@ -87,7 +88,7 @@ public class Post {
 
     public String getPostDate() {
         String updatedMinute = postDate.getMinutes() < 10 ? "0" + postDate.getMinutes() : "" + postDate.getMinutes();
-        return "pubblicato il: " + (postDate.getDay() + 2) + "/" +(postDate.getMonth() +1 ) + "/" +(postDate.getYear() - 100) + " alle ore: "+postDate.getHours()+":"+updatedMinute;
+        return "pubblicato il: " + (postDate.getDate()) + "/" +(postDate.getMonth() +1 ) + "/" +(postDate.getYear() - 100) + " alle ore: "+postDate.getHours()+":"+updatedMinute;
     }
 
     public String getAuthorName() {
